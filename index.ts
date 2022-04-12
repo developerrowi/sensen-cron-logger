@@ -42,10 +42,11 @@ app.use(secureMiddleware)
 
 app.post('/', async (req, res) => {
     try {
-        res.status(200).send(await handlers.postToRabbitMQ(req.body))
+        const rabbitMQSend = await handlers.postToRabbitMQ(req.body)
 
-    } catch(e) {
-        res.status(404)
+        res.status(200).send(rabbitMQSend)
+    } catch(error: any) {
+        res.status(500).send({error, step: "Error in publishing data to pubsub"});
     }
 
 })

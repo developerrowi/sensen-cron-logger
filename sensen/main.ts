@@ -13,8 +13,8 @@ export default class Main {
                 const publishId = await pubsub.topic(process.env.SENSEN_TOPIC!).publishMessage({data: Buffer.from(JSON.stringify(data)) });
                 console.log(data)
                 return {data}
-            } catch(e: any) {
-                throw new Error(e)
+            } catch(error: any) {
+                throw error
             }
 
         }
