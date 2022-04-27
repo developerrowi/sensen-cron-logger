@@ -56,6 +56,7 @@ app.listen(3000, () => {
 })
 
 // PubSub
-var creds: any = process.env.NODE_ENV === 'development' ?  fs.readFileSync(process.env.GOOGLE_APPLICATION_CREDENTIALS_ENCODED!) : process.env.GOOGLE_APPLICATION_CREDENTIALS_ENCODED!
-const pubsubCredentials = Buffer.from(creds, 'base64').toString('utf-8');
-export const pubsub = new PubSub({ credentials: JSON.parse(pubsubCredentials) });
+// var creds: any = process.env.NODE_ENV === 'development' ?  fs.readFileSync(process.env.GOOGLE_APPLICATION_CREDENTIALS_ENCODED!) : process.env.GOOGLE_APPLICATION_CREDENTIALS_ENCODED!
+// const pubsubCredentials = Buffer.from(creds, 'base64').toString('utf-8');
+// export const pubsub = new PubSub({ credentials: JSON.parse(pubsubCredentials) });
+export const pubsub = new PubSub();
