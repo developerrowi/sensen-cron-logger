@@ -39,30 +39,25 @@ spec:
           env:
             - name: GOOGLE_APPLICATION_CREDENTIALS
               value: /var/secrets/google/key.json
-            - name: TZ
-              valueFrom:
-                configMapKeyRef:
-                  key: TZ
-                  name: {{ include "microservice.fullname" . }}
             - name: NODE_ENV
               valueFrom:
                 configMapKeyRef:
                   key: NODE_ENV
                   name: {{ include "microservice.fullname" . }}
-            - name: PROJECT_ID
+            - name: SENSEN_TOPIC
               valueFrom:
                 configMapKeyRef:
-                  key: PROJECT_ID
+                  key: SENSEN_TOPIC
                   name: {{ include "microservice.fullname" . }}
-            - name: HASURA_GRAPHQL_ENDPOINT
-              valueFrom:
-                configMapKeyRef:
-                  key: HASURA_GRAPHQL_ENDPOINT
-                  name: {{ include "microservice.fullname" . }}
-            - name: HASURA_GRAPHQL_ADMIN_SECRET
+            - name: SENSEN_CONSUMER_USERNAME
               valueFrom:
                 secretKeyRef:
-                  key:  HASURA_GRAPHQL_ADMIN_SECRET
+                  key:  SENSEN_CONSUMER_USERNAME
+                  name: {{ include "microservice.fullname" . }}
+            - name: SENSEN_CONSUMER_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  key:  SENSEN_CONSUMER_PASSWORD
                   name: {{ include "microservice.fullname" . }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
