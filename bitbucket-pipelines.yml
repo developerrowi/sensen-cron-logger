@@ -1,0 +1,108 @@
+definitions:
+  step: &build
+    name: Build and push image
+    services:
+      - docker
+    caches:
+      - docker
+    script:
+      - IMG=asia.gcr.io/$GCP_PROJECT_OPERATION/$MICROSERVICE_NAMESPACE/$BITBUCKET_REPO_SLUG:$BITBUCKET_COMMIT
+      - echo "Set image tag to $IMG"
+      - echo "Build the image"
+      - docker build -t $IMG .
+      - echo "Sign-in to registry"
+      - echo $GCR_SERVICE_ACCOUNT | docker login -u _json_key --password-stdin https://asia.gcr.io
+      - echo "Export image pull secrets"
+      - cp /root/.docker/config.json dockerconfig.json
+      - echo "Push the image to registry"
+      - docker push $IMG
+    artifacts:
+      - dockerconfig.json
+  step: &deploy
+    name: Deployment
+    image: alpine/helm:3.7.0
+    script:
+      - ENVIRONMENT=$(echo $BITBUCKET_DEPLOYMENT_ENVIRONMENT | tr '[:lower:]' '[:upper:]')
+      - echo "Using $ENVIRONMENT environment"
+      - ENV=$(env | grep $ENVIRONMENT'_' | sed 's/'$ENVIRONMENT'_//g' | tr '\n' ',' | sed 's/\(.*\),/\1/')
+      - PROJECT_ID=$(echo GCP_PROJECT_$ENVIRONMENT)
+      - echo "Using $PROJECT_ID project"
+      - echo "Import google service account"
+      - MICROSERVICE_SERVICE_ACCOUNT_ENC=$(echo MICROSERVICE_SERVICE_ACCOUNT_$ENVIRONMENT | base64 -w0)
+      - echo "Import image pull secrets"
+      - DOCKER_CONFIG_JSON_ENC=$(cat dockerconfig.json | base64 -w0)
+      - export KUBECONFIG=kubeconfig.yaml
+      - echo "Upgrading deployment"
+      - helm upgrade $BITBUCKET_REPO_SLUG . --set image.repository=asia.gcr.io/$GCP_PROJECT_OPERATION/$MICROSERVICE_NAMESPACE/$BITBUCKET_REPO_SLUG --set DOCKER_CONFIG_JSON_ENC=$DOCKER_CONFIG_JSON_ENC --set MICROSERVICE_SERVICE_ACCOUNT_ENC=$MICROSERVICE_SERVICE_ACCOUNT_ENC --set image.tag=$BITBUCKET_COMMIT --set PROJECT_ID=$PROJECT_ID --set $ENV --namespace=$MICROSERVICE_NAMESPACE --create-namespace --install --output yaml
+      - echo "Show deployment history"
+      - helm history $BITBUCKET_REPO_SLUG --namespace $MICROSERVICE_NAMESPACE
+  step: &rollback
+    name: Rollback changes
+    image: alpine/helm:3.7.0
+    trigger: manual
+    script:
+      - export KUBECONFIG=kubeconfig.yaml
+      - echo "Rolling back to previous version"
+      - helm rollback $BITBUCKET_REPO_SLUG --namespace $MICROSERVICE_NAMESPACE --cleanup-on-fail --output yaml
+      - echo "Show deployment history"
+      - helm history $BITBUCKET_REPO_SLUG --namespace $MICROSERVICE_NAMESPACE
+pipelines:
+  branches:
+    dev:
+      - step:
+          name: Run unit test
+          image: node:12.14.1-alpine
+          script:
+            - echo "Loading environment variables"
+            - for v in $(env | grep 'STAGING_' | sed 's/STAGING_//g') ; do export "$v" ; done
+            - echo "Installing dependencies"
+            - echo "TODO"
+            - echo "Running unit tests"
+            - echo "TODO"
+      - step:
+          runs-on: qa.anthos.runner
+          name: Get cluster config
+          script:
+            - echo "Import cluster config"
+            - ssh-keyscan -t rsa 10.8.13.21 >> ~/.ssh/known_hosts
+            - ssh -tt bitbucket-pipelines@10.8.13.21 'cat /usr/local/share/qa-anthos/qa-anthos-kubeconfig' > kubeconfig.yaml
+            - chmod 600 kubeconfig.yaml
+          artifacts:
+            - kubeconfig.yaml
+      - step: *build
+      - step:
+          <<: *deploy
+          runs-on: qa.anthos.runner
+          deployment: Staging
+      - step:
+          <<: *rollback
+          runs-on: qa.anthos.runner
+    master:
+      - step:
+          name: Run unit test
+          image: node:12.14.1-alpine
+          script:
+            - echo "Loading environment variables"
+            - for v in $(env | grep 'PRODUCTION_' | sed 's/PRODUCTION_//g') ; do export "$v" ; done
+            - echo "Installing dependencies"
+            - echo "TODO"
+            - echo "Running unit tests"
+            - echo "TODO"
+      - step:
+          runs-on: prod.anthos.runner
+          name: Get cluster config
+          script:
+            - echo "Import cluster config"
+            - ssh-keyscan -t rsa 10.0.14.19 >> ~/.ssh/known_hosts
+            - ssh -tt bitbucket-pipelines@10.0.14.19 'cat /usr/local/share/prod-anthos/anthos-prod-cluster-kubeconfig' > kubeconfig.yaml
+            - chmod 600 kubeconfig.yaml
+          artifacts:
+            - kubeconfig.yaml
+      - step: *build
+      - step:
+          <<: *deploy
+          runs-on: prod.anthos.runner
+          deployment: Production
+      - step:
+          <<: *rollback
+          runs-on: prod.anthos.runner
