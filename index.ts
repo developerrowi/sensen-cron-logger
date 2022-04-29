@@ -27,10 +27,14 @@ app.use(cors());
 
 app.use(morgan('combined'));
 
+app.use(express.json({limit: '50mb'}));
+
+app.use(express.urlencoded({limit: '50mb'}));
+
 const secureMiddleware = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
     // console.log(req.headers.authorization)
-    if (!req.headers) return res.status(403).json({ error: 'Missing credentials' });
-    let authorization: any = req.headers.authorization?.split(' ');
+    if (!req.headers || !req.headers.authorization) return res.status(403).json({ error: 'Missing credentials' });
+    let authorization: any = req.headers?.authorization?.split(' ');
     const buff = Buffer.from(authorization[1], 'base64');
     let decodedAuth = buff.toString();
 
