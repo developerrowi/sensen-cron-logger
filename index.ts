@@ -21,8 +21,6 @@ const app = express()
 
 app.use(helmet());
 
-app.use(bodyParser.json());
-
 app.use(cors());
 
 app.use(morgan('combined'));
