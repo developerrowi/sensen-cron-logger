@@ -65,7 +65,6 @@ app.use(secureMiddleware)
 
 app.post('/', async (req, res) => {
     try {
-        logger.info({req, message: `new entry received`})
         const rabbitMQSend = await handlers.postToRabbitMQ(req.body)    
         res.status(200).send(rabbitMQSend)
     } catch (error: any) {
