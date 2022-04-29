@@ -1,15 +1,22 @@
 import express from 'express';
-import bodyParser from 'body-parser';
 import cors from 'cors'
 import helmet from 'helmet'
 import morgan from 'morgan'
 import Main from './sensen/main';
 import { PubSub } from '@google-cloud/pubsub';
 import fs from 'fs'
+import bodyParser from 'body-parser';
+import winston from 'winston';
 
 require('dotenv').config()
 
 let handlers = new Main()
+
+const logger = winston.createLogger({
+    level: 'info',
+    format: winston.format.json(),
+    transports: [new winston.transports.Console()],
+});
 
 // PubSub
 // var creds: any = process.env.NODE_ENV === 'development' ?  fs.readFileSync(process.env.GOOGLE_APPLICATION_CREDENTIALS_ENCODED!) : process.env.GOOGLE_APPLICATION_CREDENTIALS_ENCODED!
@@ -18,6 +25,11 @@ let handlers = new Main()
 export const pubsub = new PubSub();
 
 const app = express()
+
+
+app.use(bodyParser.json());
+
+app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
 
 app.use(helmet());
 
@@ -53,7 +65,8 @@ app.use(secureMiddleware)
 
 app.post('/', async (req, res) => {
     try {
-        const rabbitMQSend = await handlers.postToRabbitMQ(req.body)
+        logger.info({req, message: `new entry received`})
+        const rabbitMQSend = await handlers.postToRabbitMQ(req.body)    
         res.status(200).send(rabbitMQSend)
     } catch (error: any) {
         res.status(500).send({ error, step: "Error in publishing data to pubsub" });
