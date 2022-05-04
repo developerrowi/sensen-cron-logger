@@ -11,15 +11,15 @@ export default class Main {
             let mainData = Buffer.from(JSON.stringify(data))
 
 
-            let finalData: any = {
-                context: {
-                    data: {
-                        message: mainData
-                    }
-                }
-            }
+            // let finalData: any = {
+            //     context: {
+            //         data: {
+            //             message: mainData
+            //         }
+            //     }
+            // }
 
-            const publishId = await pubsub.topic(process.env.SENSEN_TOPIC!).publishMessage({ data: finalData });
+            const publishId = await pubsub.topic(process.env.SENSEN_TOPIC!).publishMessage({ data: mainData });
             console.log(data)
             return { data }
         } catch (error: any) {
