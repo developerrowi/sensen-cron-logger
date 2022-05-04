@@ -8,8 +8,6 @@ export default class Main {
     async postToPubSub(data: any) {
         // 'Post to rabbitMQ here'
         try {
-            let mainData = Buffer.from(JSON.stringify(data))
-
 
             let finalData: any = {
                 context: {
@@ -19,8 +17,7 @@ export default class Main {
                 }
             }
 
-            const publishId = await pubsub.topic(process.env.SENSEN_TOPIC!).publishMessage({ data: Buffer.from(JSON.stringify(mainData)) });
-            // console.log(finalData)
+            const publishId = await pubsub.topic(process.env.SENSEN_TOPIC!).publishMessage({ data: Buffer.from(JSON.stringify(finalData)) });
             return { data }
         } catch (error: any) {
             throw error
