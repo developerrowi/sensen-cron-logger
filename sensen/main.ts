@@ -5,10 +5,21 @@ export default class Main {
 
     constructor() { }
 
-    async postToRabbitMQ(data: any) {
+    async postToPubSub(data: any) {
         // 'Post to rabbitMQ here'
         try {
-            const publishId = await pubsub.topic(process.env.SENSEN_TOPIC!).publishMessage({ data: Buffer.from(JSON.stringify(data)) });
+            let mainData = Buffer.from(JSON.stringify(data))
+
+
+            let finalData: any = {
+                context: {
+                    data: {
+                        message: mainData
+                    }
+                }
+            }
+
+            const publishId = await pubsub.topic(process.env.SENSEN_TOPIC!).publishMessage({ data: finalData });
             console.log(data)
             return { data }
         } catch (error: any) {
