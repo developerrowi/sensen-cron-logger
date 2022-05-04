@@ -27,19 +27,15 @@ export const pubsub = new PubSub();
 const app = express()
 
 
-app.use(bodyParser.json());
-
-app.use(bodyParser.urlencoded({limit: '50mb', extended: true}));
-
 app.use(helmet());
 
 app.use(cors());
 
 app.use(morgan('combined'));
 
-app.use(express.json({limit: '50mb'}));
+app.use(express.json({limit: '1000mb'}));
 
-app.use(express.urlencoded({limit: '50mb'}));
+app.use(express.urlencoded({limit: '1000mb'}));
 
 const secureMiddleware = async (req: express.Request, res: express.Response, next: express.NextFunction) => {
     // console.log(req.headers.authorization)
