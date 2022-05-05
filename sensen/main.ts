@@ -12,7 +12,9 @@ export default class Main {
             let finalData: any = {
                 context: {
                     data: {
-                        message: data
+                        message: {
+                            jsonRequest: data
+                        }
                     }
                 }
             }
