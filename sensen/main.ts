@@ -11,7 +11,7 @@ export default class Main {
         try {
 
             let finalData: any = { jsonRequest: data }
-            const handId = finalData.HandId
+            const handId = finalData.jsonRequest.HandId
 
             logger.info({finalData, handID: handId + " has been published"})
 
