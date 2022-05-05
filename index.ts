@@ -12,12 +12,14 @@ require('dotenv').config()
 
 let handlers = new Main()
 
-const logger = winston.createLogger({
+// logger 
+let loggerOptions = {
     level: 'info',
     format: winston.format.json(),
     transports: [new winston.transports.Console()],
-});
-
+};
+export const logger = winston.createLogger(loggerOptions);
+//
 // PubSub
 // var creds: any = process.env.NODE_ENV === 'development' ?  fs.readFileSync(process.env.GOOGLE_APPLICATION_CREDENTIALS_ENCODED!) : process.env.GOOGLE_APPLICATION_CREDENTIALS_ENCODED!
 // const pubsubCredentials = Buffer.from(creds, 'base64').toString('utf-8');
