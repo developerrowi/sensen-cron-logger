@@ -9,15 +9,8 @@ export default class Main {
         // 'Post to rabbitMQ here'
         try {
 
-            let finalData: any = {
-                context: {
-                    data: {
-                        message: {
-                            jsonRequest: data
-                        }
-                    }
-                }
-            }
+            let finalData: any = { jsonRequest: data }
+
 
             const publishId = await pubsub.topic(process.env.SENSEN_TOPIC!).publishMessage({ data: Buffer.from(JSON.stringify(finalData)) });
             return { data }
