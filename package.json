@@ -1,5 +1,5 @@
 {
-  "name": "sensen-consumer",
+  "name": "sensen-cron-logger",
   "version": "1.0.0",
   "description": "Sensen Consumer",
   "scripts": {
@@ -11,20 +11,37 @@
   "keywords": [
     "Sensen",
     "Consumer",
-    "sensen-consumer"
+    "sensen-cron-logger"
   ],
   "author": "triggercampaigndevs",
   "license": "ISC",
   "dependencies": {
+    "@google-cloud/logging-winston": "^4.0.5",
     "@google-cloud/pubsub": "^2.12.0",
-    "cors": "^2.8.5",
-    "debug": "^4.3.4",
-    "dotenv": "^16.0.0",
-    "express": "^4.17.3",
-    "express-winston": "^4.2.0",
-    "helmet": "^5.0.2",
-    "morgan": "^1.10.0",
-    "winston": "^3.7.2"
+    "@sentry/node": "^6.14.3",
+    "@sentry/tracing": "^6.14.3",
+    "@types/node-cron": "^3.0.1",
+    "@types/nodemailer": "^6.4.4",
+    "apollo-link": "^1.2.2",
+    "apollo-link-ws": "^1.0.8",
+    "axios": "^0.21.1",
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1",
+    "graphql": "^0.13.2",
+    "graphql-tag": "^2.9.2",
+    "lodash": "^4.17.21",
+    "messagebird": "^3.6.2",
+    "moment": "^2.29.1",
+    "moment-timezone": "^0.5.33",
+    "node-cron": "^3.0.0",
+    "nodemailer": "^6.7.2",
+    "redis": "^3.1.2",
+    "rox-node": "^4.9.18",
+    "subscriptions-transport-ws": "^0.9.12",
+    "ts-node": "^10.0.0",
+    "typescript": "^4.3.2",
+    "validatorjs": "^3.22.1",
+    "winston": "^3.3.3"
   },
   "devDependencies": {
     "@types/cors": "^2.8.12",
